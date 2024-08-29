@@ -1,0 +1,10 @@
+&user_inputs
+gamma0 = 0.1
+gamma1 = 100.0
+L = 1.0
+N = 19
+Q0 = 0.5
+Q1 = 1000
+U = 10
+tol = 1e-12
+&end/

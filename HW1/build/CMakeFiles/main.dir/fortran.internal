@@ -1,0 +1,5 @@
+# The fortran modules provided by this target.
+provides
+ m_global_parameters.mod
+ m_helpers.mod
+ m_linear_algebra.mod

@@ -1,0 +1,163 @@
+\documentclass[reqno]{amsart}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{scrextend}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage[headheight=12pt,textwidth=7in,top=1in, bottom=1in]{geometry}
+\usepackage{listings}
+\usepackage{cancel}
+\usepackage{cleveref}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+%some custom commands you may find useful
+\usepackage{xparse}
+\DeclareDocumentCommand{\diff}{O{} m}{
+	\frac{\mathrm{d} #1}{\mathrm{d}#2}
+}
+\DeclareDocumentCommand{\difftwo}{O{} m}{
+	\frac{\mathrm{d}^2 #1}{\mathrm{d}#2^2}
+}
+\DeclareDocumentCommand{\pdiff}{O{} m}{
+	\frac{\partial #1}{\partial #2}
+}
+\DeclareDocumentCommand{\pdifftwo}{O{} m}{
+	\frac{\partial^{2} #1}{\partial #2^{2}}
+}
+\DeclareDocumentCommand{\integral}{O{} O{} m O{x}}{
+	\int_{#1}^{#2} #3\ \mathrm{d}#4
+}
+\DeclareDocumentCommand{\sp}{}{
+	\qquad \qquad \qquad }{
+}
+\NewDocumentEnvironment{solution}{}{
+	\begin{addmargin}[2em]{0pt}
+	}{\end{addmargin} \vskip0.25cm
+}
+
+\newenvironment{sysmatrix}[1]
+{\left(\begin{array}{@{}#1@{}}}
+	{\end{array}\right)}
+\newcommand{\ro}[1]{%
+	\xrightarrow{\mathmakebox[\rowidth]{#1}}%
+}
+\newlength{\rowidth}% row operation width
+\AtBeginDocument{\setlength{\rowidth}{3em}}
+
+\def\name{Ben Wilfong} %your name goes here
+\def\ID{bwilfong3} %your cm goes here
+
+%these packages create the footer and page numbering
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\lhead{\name}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chead{ME 7751 Homework \#1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rhead{Username: \ID}
+\fancyfoot[C]{\footnotesize Page \thepage\ of \pageref{LastPage}}
+\fancypagestyle{firststyle}
+{ \renewcommand{\headrulewidth}{0pt}%
+	\fancyhf{}%
+	\fancyfoot[C]{\footnotesize Page \thepage\ of \pageref{LastPage}}
+}
+
+\lstset{language=Matlab,%
+	%basicstyle=\color{red},
+	breaklines=true,%
+	morekeywords={matlab2tikz},
+	keywordstyle=\color{blue},%
+	morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+	identifierstyle=\color{black},%
+	stringstyle=\color{mylilas},
+	commentstyle=\color{mygreen},%
+	showstringspaces=false,%without this there will be a symbol in the places where there is a space
+	numbers=left,%
+	numberstyle={\tiny \color{black}},% size of the numbers
+	numbersep=9pt, % this defines how far the numbers are from the text
+	emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+	%emph=[2]{word1,word2}, emphstyle=[2]{style},
+}
+
+\begin{document}
+	\noindent
+	\thispagestyle{firststyle}
+	\begin{tabular}{l}
+		{\LARGE \textbf{ME 7751: Intro to CFD} }\\
+		%%%%%%%%%%%%%%%%%%%%%%%%%
+		{\Large Homework Set \#1}
+		%%%%%%%%%%%%%%%%%%%%%%%%%
+	\end{tabular} \hfill \begin{tabular}{r}
+		\name \\
+		Username: \ID
+	\end{tabular}
+	\noindent\makebox[\linewidth]{\rule{\textwidth}{1pt}}
+
+    \section{Part A - Numerical Method}
+    \noindent The one dimensional steady state transport equation
+    \begin{equation*}
+        U\pdiff[\phi]{x} = \pdiff{x}\left(\Gamma \pdiff[\phi]{x}\right) + Q
+    \end{equation*}
+    can be discretized with central differences as
+    \begin{equation}
+        U\frac{\phi_{i + 1} - \phi_{i - 1}}{2\Delta x} - \underbrace{\frac{\left(\Gamma\pdiff[\phi]{x}\right)_{i + 1/2} - \left(\Gamma \pdiff[\phi]{x}\right)_{i - 1/2}}{\Delta x}}_{b} = Q_i.
+    \label{eqn:a}
+    \end{equation}
+    The first derivatives in the numerator of $b$ can be written as
+    \begin{equation}
+        \left(\Gamma\pdiff[\phi]{x}\right)_{i + 1/2} = \Gamma_{i + 1/2}\frac{\phi_{i + 1} - \phi_{i}}{\Delta x}\quad \text{ and  }\quad \left(\Gamma\pdiff[\phi]{x}\right)_{i - 1/2} = \Gamma_{i - 1/2}\frac{\phi_{i} - \phi_{i-1}}{\Delta x}.
+    \label{eqn:b}
+    \end{equation}
+    Substituting \cref{eqn:b} into \cref{eqn:a} and rearanging gives
+    \begin{align}
+    U\frac{\phi_{i + 1} - \phi_{i - 1}}{2\Delta x} -
+    \frac{\Gamma_{i + 1/2}\frac{\phi_{i + 1} - \phi_{i}}{\Delta x} - \Gamma_{i - 1/2}\frac{\phi_{i} - \phi_{i - 1}}{\Delta x}}{\Delta x} & = Q_i \notag \\
+    U\frac{\phi_{i + 1} - \phi_{i - 1}}{2\Delta x} -
+    \frac{\Gamma_{i + 1/2}\phi_{i + 1} - (\Gamma_{i + 1/2} + \Gamma_{i - 1/2})\phi_{i} + \Gamma_{i - 1/2}\phi_{i -1}}{\left(\Delta x\right)^2} &= Q_i \notag \\
+    \left(\frac{U}{2\Delta x} - \frac{\Gamma_{i + 1/2}}{(\Delta x)^2}\right)\phi_{i + 1} +
+    \left(\frac{\Gamma_{i + 1/2} + \Gamma_{i - 1/2}}{(\Delta x)^2}\right)\phi_i -
+    \left(\frac{U}{2\Delta x} + \frac{\Gamma_{i - 1/2}}{(\Delta x)^2}\right)\phi_{i - 1} &= Q_i \label{eqn:c}.
+    \end{align}
+    \Cref{eqn:c} can be cast as the system of linear equations
+    \begin{equation*}
+        \underbrace{\begin{bmatrix}
+        1 \\
+        -\left(\frac{U}{2\Delta x} + \frac{\Gamma_{1/2}}{(\Delta x)^2}\right) & \frac{\Gamma_{3/2}+\Gamma_{1/2}}{(\Delta x)^2} & \frac{U}{2\Delta x} - \frac{\Gamma_{3/2}}{(\Delta x)^2} \\
+        \ddots & \ddots & \ddots \\
+        & -\left(\frac{U}{2\Delta x} + \frac{\Gamma_{N - 3/2}}{(\Delta x)^2}\right) & \frac{\Gamma_{N - 1/2}+\Gamma_{N - 3/2}}{(\Delta x)^2} & \frac{U}{2\Delta x} - \frac{\Gamma_{i -1/2}}{(\Delta x)^2} \\
+        &&& 1
+\end{bmatrix}}_{\mathrm{\bm{A}}}
+\underbrace{\begin{pmatrix} \phi_{0} \\ \phi_{1} \\ \vdots \\ \phi_{N-1} \\ \phi_{N} \end{pmatrix}}_{\Phi}
+        =
+        \underbrace{\begin{pmatrix} 1 \\ Q_1 \\ \vdots \\ Q_{N-1} \\ 0 \end{pmatrix}}_{b}
+    \end{equation*}
+    for a discretization at $\{x_0,\ x_1,\ \dots \, x_N\} = \{0,\ \Delta x,\ 2\Delta x,\dots,\ N\Delta x$\}.
+    The boundary conditions are given by $\phi_{-1/2} = 1$ and $\phi_{N + 1/2} = 0$. \\~\\
+    For the cases in which $U,\ \Gamma,$ and $Q$ are constant, the solution is found via the following steps:
+    \begin{enumerate}
+        \item Populate the matrix $\mathrm{\bm{A}}$
+        \item Populate the vector $b$
+        \item Solve $A\Phi = b$ for the vector $\Phi$ using TDMA
+    \end{enumerate}
+    When $U,\ \Gamma,$ or $Q$ depend on the value of $\phi$ the problem becomes nonlinear and an iterative approach must be taken.
+    For nonlinear problems, the solution is found via the following steps:
+    \begin{enumerate}
+        \item Make an initial guess for the vector $\Phi^{(0)}$
+        \item Calculate $U(\Phi^{(n)}),\ \Gamma(\Phi^{(n)}),$ and $Q(\Phi^{(n)})$
+        \item Populate the matrix $A$
+        \item Populate the vector $b$
+        \item Solve $A\Phi^{(n+1)} = b$ for the vector $\Phi^{(n+1)}$ using TDMA
+        \item Repeat steps 2 though 5 until convergence
+    \end{enumerate}
+    For this problem I will use a discretization of $\phi(x) = 1 - x/L$ as an initial guess.
+    \section{Part B - Linear Problems}
+
+    \section{Part C - Non-linear Problems}
+
+\end{document}
+
