@@ -1,1 +1,0 @@
-/opt/homebrew/bin/gfortran  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk CMakeFiles/main.dir/src/m_global_parameters.f90.o CMakeFiles/main.dir/src/m_helpers.f90.o CMakeFiles/main.dir/src/m_linear_algebra.f90.o CMakeFiles/main.dir/src/p_main.f90.o -o main
