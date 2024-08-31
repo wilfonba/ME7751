@@ -24,7 +24,7 @@ module m_linear_algebra
             integer :: i
             real(kind(0d0)) :: w
 
-            ! Upper triangularization
+            ! In place LU factorization
             do i = 1, N
                 w = A(i,0)/A(i-1,1)
 

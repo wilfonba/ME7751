@@ -3,16 +3,49 @@
 \usepackage{amsmath}
 \usepackage{scrextend}
 \usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{tcolorbox}
 \usepackage[headheight=12pt,textwidth=7in,top=1in, bottom=1in]{geometry}
 \usepackage{listings}
 \usepackage{cancel}
-\usepackage{cleveref}
 \usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
 \definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
 \definecolor{mylilas}{RGB}{170,55,241}
+
+\usepackage[]{xcolor}
+\definecolor{lightblue}{rgb}{0.63, 0.74, 0.78}
+\definecolor{seagreen}{rgb}{0.18, 0.42, 0.41}
+\definecolor{orange}{rgb}{0.85, 0.55, 0.13}
+\definecolor{silver}{rgb}{0.69, 0.67, 0.66}
+\definecolor{rust}{rgb}{0.72, 0.26, 0.06}
+\definecolor{purp}{RGB}{68, 14, 156}
+
+\colorlet{lightrust}{rust!50!white}
+\colorlet{lightorange}{orange!25!white}
+\colorlet{lightlightblue}{lightblue}
+\colorlet{lightsilver}{silver!30!white}
+\colorlet{darkorange}{orange!75!black}
+\colorlet{darksilver}{silver!65!black}
+\colorlet{darklightblue}{lightblue!65!black}
+\colorlet{darkrust}{rust!85!black}
+\colorlet{darkseagreen}{seagreen!85!black}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+}
+
+\hypersetup{
+  linkcolor=darkrust,
+  citecolor=seagreen,
+  urlcolor=darkrust,
+  pdfauthor=author,
+}
+
+\usepackage{cleveref}
 
 %some custom commands you may find useful
 \usepackage{xparse}
@@ -67,21 +100,21 @@
 	\fancyfoot[C]{\footnotesize Page \thepage\ of \pageref{LastPage}}
 }
 
-\lstset{language=Matlab,%
-	%basicstyle=\color{red},
-	breaklines=true,%
-	morekeywords={matlab2tikz},
-	keywordstyle=\color{blue},%
-	morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
-	identifierstyle=\color{black},%
-	stringstyle=\color{mylilas},
-	commentstyle=\color{mygreen},%
-	showstringspaces=false,%without this there will be a symbol in the places where there is a space
-	numbers=left,%
-	numberstyle={\tiny \color{black}},% size of the numbers
-	numbersep=9pt, % this defines how far the numbers are from the text
-	emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
-	%emph=[2]{word1,word2}, emphstyle=[2]{style},
+\lstset{frame=tb,
+  language=[90]Fortran,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{darklightblue},
+  commentstyle=\color{seagreen},
+  stringstyle=\color{darkrust},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
 }
 
 \begin{document}
@@ -154,7 +187,36 @@
         \item Solve $A\Phi^{(n+1)} = b$ for the vector $\Phi^{(n+1)}$ using TDMA
         \item Repeat steps 2 though 5 until convergence
     \end{enumerate}
-    For this problem I will use a discretization of $\phi(x) = 1 - x/L$ as an initial guess.
+    For this problem I will use a discretization of $\phi(x) = 1 - x/L$ as an initial guess. \\~\
+
+    \noindent The tridiagonal matrix $A$ is stored in an $N+1\times 3$ to take advantage of it's sparsity.
+    The lower, center, and upper diagonal are stored in $A_{1:N,0}$, $A_{0:N,1}$, and $A_{0:N-1,2}$.
+    The tridiagonal linear solve using this data structure is given in \cref{alg:TDMA}. \\ \vspace{-0.25in}
+    \begin{center}\begin{minipage}{0.5\textwidth}\begin{algorithm}[H]
+        \caption{Tridiagonal Matrix Algorithm} \label{alg:TDMA}
+        \begin{algorithmic}
+            \State Given: $A$ \Comment{$N+1\times N+1$}
+            \State Given: $x$ \Comment{$N+1\times 1$}
+            \State Given: $b$ \Comment{$N+1\times 1$}
+            \State
+            \For{$i = 1:N$} \Comment{In place LU factorization}
+                \State $w = A_{i,0}/A_{i-1,1}$
+                \State $A_{i,0} = A_{i,0} - wA_{i-1,1}$
+                \State $A_{i,1} = A_{i,0} - wA_{i-1,2}$
+                \State $A_{i,0} = w$
+            \EndFor
+            \State
+            \State $y_0 = b_0$ \Comment{Forward Substitution}
+            \For{$i = 1:N$}
+                \State $y_i = b_i - A_{i,0)y_{i - 1}}$
+            \EndFor
+            \State
+            \State $x_N = y_N/A_{N,1}$ \Comment{Backward Substitution}
+            \For{$i = N-1:-1:0$}
+            \State $x_i = \frac{y_i - A_{i,2}x_{i + 1}}{A_{i,1}}$
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}\end{minipage}\end{center}
     \section{Part B - Linear Problems}
 
     \section{Part C - Non-linear Problems}
