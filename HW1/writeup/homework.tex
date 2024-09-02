@@ -218,6 +218,17 @@
         \end{algorithmic}
     \end{algorithm}\end{minipage}\end{center}
     \section{Part B - Linear Problems}
+    \Cref{fig:B} shows the solution, average error, and runtime for the case $U = 1,\ \Gamma = 0.1,$ and $Q = 0$ with $N = 10,\ 20,\ 30,\ 40,\ 50.$
+    The error decreases with increasing $N$ as expected.
+    The plot of average error versus $N$ shows that the method is second-order-accurate.
+    This is because the error decreases with a slope of two in loglog space.
+    This order of accuracy is expected given that central differences were used to discretize the derivatives.
+    \begin{figure}
+        \centering
+        \includegraphics[width=4in]{partA.png}
+        \caption{Solution and average error for $N = 10, 20, 30, 40, 50$}
+        \label{fig:B}
+    \end{figure}
 
     \section{Part C - Non-linear Problems}
 

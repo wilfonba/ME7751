@@ -916,6 +916,14 @@ INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT ./homework.aux
 INPUT homework.aux
 INPUT homework.aux
@@ -1042,6 +1050,11 @@ INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/omscmr.fd
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/omscmr.fd
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/omscmr.fd
 INPUT /usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map
+INPUT ./partA.png
+INPUT ./partA.png
+INPUT partA.png
+INPUT ./partA.png
+INPUT ./partA.png
 INPUT homework.aux
 INPUT ./homework.out
 INPUT ./homework.out
