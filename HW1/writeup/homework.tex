@@ -1,4 +1,4 @@
-\documentclass[reqno]{amsart}
+\documentclass[reqno, 12pt]{article}
 \usepackage{enumerate}
 \usepackage{amsmath}
 \usepackage{scrextend}
@@ -14,6 +14,7 @@
 \usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
 \definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
 \definecolor{mylilas}{RGB}{170,55,241}
+\usepackage{dirtree}
 
 \usepackage[]{xcolor}
 \definecolor{lightblue}{rgb}{0.63, 0.74, 0.78}
@@ -119,19 +120,84 @@
 
 \begin{document}
 	\noindent
-	\thispagestyle{firststyle}
-	\begin{tabular}{l}
-		{\LARGE \textbf{ME 7751: Intro to CFD} }\\
-		%%%%%%%%%%%%%%%%%%%%%%%%%
-		{\Large Homework Set \#1}
-		%%%%%%%%%%%%%%%%%%%%%%%%%
-	\end{tabular} \hfill \begin{tabular}{r}
-		\name \\
-		Username: \ID
-	\end{tabular}
-	\noindent\makebox[\linewidth]{\rule{\textwidth}{1pt}}
+    \thispagestyle{firststyle}
+	%\begin{tabular}{l}
+		%{\LARGE \textbf{ME 7751: Intro to CFD} }\\
+		%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%{\Large Homework Set \#1}
+		%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%\end{tabular} \hfill \begin{tabular}{r}
+		%\name \\
+		%Username: \ID
+	%\end{tabular}
+	%\noindent\makebox[\linewidth]{\rule{\textwidth}{1pt}}
+    \begin{center}
+        \LARGE{\textbf{Solution of the 1D steady transport equation with the finite difference method}} \\
+        \Large{September 16$^{th}$, 2024} \\
+        \large{Ben Wilfong}
+    \end{center}
+    \section*{Files}
+    \dirtree{%
+        .1 HW1\_root.
+         .2 CMakeLists.txt.
+         .2 README.md.
+         .2 homework.pdf.
+         .2 main.inp.
+         .2 make.sh.
+         .2 src.
+         .3 m\_global\_parameters.f90.
+         .3 m\_helpers.f90.
+         .3 m\_linear\_algebra.f90.
+         .3 p\_main.f90.
+         .2 plots.
+         .3 outputB10.csv.
+         .3 outputB20.csv.
+         .3 outputB30.csv.
+         .3 outputB40.csv.
+         .3 outputB50.csv.
+         .3 outputC1.csv.
+         .3 outputC2.csv.
+         .3 outputC3.csv.
+         .3 plots.m.
+    }
+    \section*{Compiling}
+    This code can be compiled in a terminal by running \texttt{chmod u+x ./mfc.sh} followed by \texttt{./mfc.sh} in the \texttt{HW1\_root/} directory.
+    This will compile and link the source code in the \texttt{src/} directory and create an executable called \texttt{main} in the \texttt{HW1\_root/} directory.
+    \section*{Running}
+    The problem parameters are defined in the namelist file \texttt{main.inp} in \texttt{HW1\_root/}.
+    The input parameters are:
+    \begin{itemize}
+        \setlength\itemsep{-0.25em}
+        \item gamma0: The coefficient for the zero degree term in the polynomial defining gamma
+        \item gamma1: The coefficient for the first degree term in the polynomial defining gamma
+        \item L: The length of the domain
+        \item N: The number of cells to use
+        \item Q0: The coefficient for the zero degree term in the polynomial defining Q
+        \item Q1: The coefficient for the first degree term in the polynomial defining Q
+        \item U: The convective velocity
+        \item tol: Convergence tolerance for nonlinear problems
+        \item bench: Toggles benchmarking mode. When true, the code is ran $1\times 10^6$ times and the average runtime is output.
+    \end{itemize}
+    Once the input parameters are set, the code is ran with \texttt{./main}.
+    After execution, the solution is writen to \texttt{HW1\_root/output.csv} with the first column holding the x coordinates and the second column holding the solution.
+    Additionally, the following will be written to the terminal:
+    \begin{verbatim}
+     Solving the 1D Steady Transport Equation with:
+     gamma0:   0.10000000000000001
+     gamma1:   0.10000000000000001
+     U:    0.0000000000000000
+     Q0:    0.0000000000000000
+     Q1:    0.0000000000000000
+     N:           20
+     Execution time:    4.99999987E-05  s
+     Iterations:           12
+    \end{verbatim}
+    \vspace{-0.25in}
+    This serves as a sanity check for the problem parameters and provides the runtime and number of iterations to convergence.
+    Plots are created by running \texttt{plots.m} from the \texttt{root/plots/} directory.
+    \newpage
 
-    \section{Part A - Numerical Method}
+    \section*{Part A - Numerical Method}
     \noindent The one dimensional steady state transport equation
     \begin{equation*}
         U\pdiff[\phi]{x} = \pdiff{x}\left(\Gamma \pdiff[\phi]{x}\right) + Q
@@ -189,48 +255,47 @@
     \end{enumerate}
     For this problem I will use a discretization of $\phi(x) = 1 - x/L$ as an initial guess. \\~\
 
-    \noindent The tridiagonal matrix $A$ is stored in an $N+1\times 3$ to take advantage of it's sparsity.
-    The lower, center, and upper diagonal are stored in $A_{1:N,0}$, $A_{0:N,1}$, and $A_{0:N-1,2}$.
-    The tridiagonal linear solve using this data structure is given in \cref{alg:TDMA}. \\ \vspace{-0.25in}
-    \begin{center}\begin{minipage}{0.5\textwidth}\begin{algorithm}[H]
-        \caption{Tridiagonal Matrix Algorithm} \label{alg:TDMA}
-        \begin{algorithmic}
-            \State Given: $A$ \Comment{$N+1\times N+1$}
-            \State Given: $x$ \Comment{$N+1\times 1$}
-            \State Given: $b$ \Comment{$N+1\times 1$}
-            \State
-            \For{$i = 1:N$} \Comment{In place LU factorization}
-                \State $w = A_{i,0}/A_{i-1,1}$
-                \State $A_{i,0} = A_{i,0} - wA_{i-1,1}$
-                \State $A_{i,1} = A_{i,0} - wA_{i-1,2}$
-                \State $A_{i,0} = w$
-            \EndFor
-            \State
-            \State $y_0 = b_0$ \Comment{Forward Substitution}
-            \For{$i = 1:N$}
-                \State $y_i = b_i - A_{i,0)y_{i - 1}}$
-            \EndFor
-            \State
-            \State $x_N = y_N/A_{N,1}$ \Comment{Backward Substitution}
-            \For{$i = N-1:-1:0$}
-            \State $x_i = \frac{y_i - A_{i,2}x_{i + 1}}{A_{i,1}}$
-            \EndFor
-        \end{algorithmic}
-    \end{algorithm}\end{minipage}\end{center}
-    \section{Part B - Linear Problems}
+    \section*{Part B - Linear Problems}
     \Cref{fig:B} shows the solution, average error, and runtime for the case $U = 1,\ \Gamma = 0.1,$ and $Q = 0$ with $N = 10,\ 20,\ 30,\ 40,\ 50.$
     The error decreases with increasing $N$ as expected.
     The plot of average error versus $N$ shows that the method is second-order-accurate.
     This is because the error decreases with a slope of two in loglog space.
     This order of accuracy is expected given that central differences were used to discretize the derivatives.
-    \begin{figure}
+    The runtime on a single Apple M2 core, calculated as an average of $1\times 10^6$ samples, increases with $N$ with a slope of approximately one in loglog space.
+    This indicates that the method is $\mathcal{O}(n)$, which agrees with the theoretical time complexity of the TDMA.
+    The small difference is slopes is likely a result of the small problem size, meaning that the asymptotic assumption is not yet met.
+    \begin{figure}[h]
         \centering
-        \includegraphics[width=4in]{partA.png}
-        \caption{Solution and average error for $N = 10, 20, 30, 40, 50$}
+        \includegraphics[width=\textwidth]{partA.png}
+        \caption{Solution, average error, and runtime for $N = 10, 20, 30, 40, 50$}
         \label{fig:B}
     \end{figure}
 
-    \section{Part C - Non-linear Problems}
+    \section*{Part C - Non-linear Problems}
+    \Cref{fig:C} shows the solution and pointwise error for the case $U = 0,\ \Gamma = 0.1 + 0.1\varphi$ and $N = 20$ for $Q = 0,\ 0.1,$ and $0.1x$.
+    The solution for $Q = 0.1x$ lies between the solutions for $Q = 0$ and $Q = 0.1$.
+    This is because the total source flux, given by $Q = \int_{0}^L Q\mathrm{d}l$, satisfies $Q_0 < Q_{0.1x} < Q_{0.1}$ and a larger total source flux results in a higher curve.
+    The pointwise error is between the discretized solution and the exact solution is less than the specified tolerance of $1\times 10^{-3}$.
+    The iterative solve is what differentiates the approach for solving this nonlinear problem from the approach to solving the linear equation.
+    Since the coefficients depend on the solution, an initial guess for the solution must be made and iterated on until a specified convergence tolerance has been met.
+    The runtime on a single Apple M2 core for each $Q$, averaged over $1\times 10^6$ runs is given in \cref{tab:c}.
+    This runtime is 5.3 times longer than the linear solve for the $N = 20$ case.
+    The increase in runtime is because 5 iterations are required to reach convergence and each iteration requires the additional calculation of an error estimate.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.66\textwidth]{partC.png}
+        \caption{Solution and pointwise error for $Q = 0, 0.1, 0.1x$}
+        \label{fig:B}
+    \end{figure}
+    \begin{table}[h]
+        \centering
+        \caption{Run time for $Q = 0, 0.1, 0.1x$}
+        \begin{tabular}{r | c c c}
+            $Q$ & 0 & 0.1 & 0.1x \\ \hline
+             Runtime ($\mu$s) & 6.3 & 6.3 & 6.2
+        \end{tabular}
+        \label{tab:c}
+    \end{table}
 
 \end{document}
 

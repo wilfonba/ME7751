@@ -1,0 +1,239 @@
+\documentclass[reqno, 12pt]{amsart}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{scrextend}
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage[headheight=12pt,textwidth=7in,top=1in, bottom=1in]{geometry}
+\usepackage{listings}
+\usepackage{cancel}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+\usepackage[]{xcolor}
+\definecolor{lightblue}{rgb}{0.63, 0.74, 0.78}
+\definecolor{seagreen}{rgb}{0.18, 0.42, 0.41}
+\definecolor{orange}{rgb}{0.85, 0.55, 0.13}
+\definecolor{silver}{rgb}{0.69, 0.67, 0.66}
+\definecolor{rust}{rgb}{0.72, 0.26, 0.06}
+\definecolor{purp}{RGB}{68, 14, 156}
+
+\colorlet{lightrust}{rust!50!white}
+\colorlet{lightorange}{orange!25!white}
+\colorlet{lightlightblue}{lightblue}
+\colorlet{lightsilver}{silver!30!white}
+\colorlet{darkorange}{orange!75!black}
+\colorlet{darksilver}{silver!65!black}
+\colorlet{darklightblue}{lightblue!65!black}
+\colorlet{darkrust}{rust!85!black}
+\colorlet{darkseagreen}{seagreen!85!black}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+}
+
+\hypersetup{
+  linkcolor=darkrust,
+  citecolor=seagreen,
+  urlcolor=darkrust,
+  pdfauthor=author,
+}
+
+\usepackage{cleveref}
+
+%some custom commands you may find useful
+\usepackage{xparse}
+\DeclareDocumentCommand{\diff}{O{} m}{
+	\frac{\mathrm{d} #1}{\mathrm{d}#2}
+}
+\DeclareDocumentCommand{\difftwo}{O{} m}{
+	\frac{\mathrm{d}^2 #1}{\mathrm{d}#2^2}
+}
+\DeclareDocumentCommand{\pdiff}{O{} m}{
+	\frac{\partial #1}{\partial #2}
+}
+\DeclareDocumentCommand{\pdifftwo}{O{} m}{
+	\frac{\partial^{2} #1}{\partial #2^{2}}
+}
+\DeclareDocumentCommand{\integral}{O{} O{} m O{x}}{
+	\int_{#1}^{#2} #3\ \mathrm{d}#4
+}
+\DeclareDocumentCommand{\sp}{}{
+	\qquad \qquad \qquad }{
+}
+\NewDocumentEnvironment{solution}{}{
+	\begin{addmargin}[2em]{0pt}
+	}{\end{addmargin} \vskip0.25cm
+}
+
+\newenvironment{sysmatrix}[1]
+{\left(\begin{array}{@{}#1@{}}}
+	{\end{array}\right)}
+\newcommand{\ro}[1]{%
+	\xrightarrow{\mathmakebox[\rowidth]{#1}}%
+}
+\newlength{\rowidth}% row operation width
+\AtBeginDocument{\setlength{\rowidth}{3em}}
+
+\def\name{Ben Wilfong} %your name goes here
+\def\ID{bwilfong3} %your cm goes here
+
+%these packages create the footer and page numbering
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\lhead{\name}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chead{ME 7751 Homework \#2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rhead{Username: \ID}
+\fancyfoot[C]{\footnotesize Page \thepage\ of \pageref{LastPage}}
+\fancypagestyle{firststyle}
+{ \renewcommand{\headrulewidth}{0pt}%
+	\fancyhf{}%
+	\fancyfoot[C]{\footnotesize Page \thepage\ of \pageref{LastPage}}
+}
+
+\lstset{frame=tb,
+  language=[90]Fortran,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{darklightblue},
+  commentstyle=\color{seagreen},
+  stringstyle=\color{darkrust},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+}
+
+\begin{document}
+	\noindent
+	\thispagestyle{firststyle}
+	\begin{tabular}{l}
+		{\LARGE \textbf{ME 7751: Intro to CFD} }\\
+		%%%%%%%%%%%%%%%%%%%%%%%%%
+		{\Large Homework Set \#2}
+		%%%%%%%%%%%%%%%%%%%%%%%%%
+	\end{tabular} \hfill \begin{tabular}{r}
+		\name \\
+		Username: \ID
+	\end{tabular}
+	\noindent\makebox[\linewidth]{\rule{\textwidth}{1pt}}
+
+    \section{Part A: Discretization as a System of Linear Equations}
+
+    \noindent Suppose that the two-dimensional steady state heat equation
+    \begin{equation}
+        \lambda\left(\pdifftwo[T]{x} + \pdifftwo[T]{y}\right) + Q = 0 \label{eqn:1}
+    \end{equation}
+    is discretized onto $\{x_0, x_1, \dots, x_N\}$ and $\{y_0, y_1, \dots, y_N\}$ and that $T_{ij}$ is the temperature at coordinate $(x_i, y_j)$.
+    The second order derivatives in the $x$- and $y$-directions can be approximated with the second order central discretizations:
+    \begin{equation*}
+        \pdiff[T_{ij}]{x} \approx \frac{T_{i-1,j} - 2 T_{i,j} + T_{i + 1,j}}{\left(\Delta x\right)^2}
+        \qquad
+        \pdiff[T_{ij}]{y} \approx \frac{T_{i, j-1} - 2T_{ij} + T_{i, j + 1}}{\left(\Delta x\right)^2}.
+    \end{equation*}
+    These approximations can be substituted into \cref{eqn:1} yielding:
+    \begin{equation*}
+        \lambda\left(\frac{T_{i-1,j} + T_{i + 1,j} - 4T_{i,j} + T_{i,j-1} + T_{i,j + 1}}{2h^2}\right) = -Q_{i,j},
+    \end{equation*}
+    assuming that $h = \Delta x = \Delta y$.
+    The Dirichelet boundary conditions on the left and right of the domain are given by $T_{0,j} = 0$ and $T_{N,j} = 2y_j^3 - 3y_j^2 + 1$.
+    The Neumann boundary conditions at the top and bottom of the boundry are given by
+    \begin{align*}
+        j = 0&: \frac{-3T_{i,0} + 2T_{i,1} - T_{i,2}}{2h}= 0, \\
+        j = N&: \frac{-3T_{i,N} + 2T_{i,N-1} - T_{i,N-2}}{2h} = 0,
+    \end{align*}
+    where second order one-sided differences are used.
+    This discretization can be cast as a block tridiagonal system of linear equations.
+    The solution vector $T$ is given by:
+    \begin{equation*}
+        T = \begin{pmatrix} T_0 \\ T_1 \\ \vdots \\ T_N \end{pmatrix}
+        \text{ where }
+        T_{j\in 0:N} = \begin{pmatrix} T_{0,j} \\ T_{1,j} \\ \vdots \\ T_{N,j} \end{pmatrix}.
+    \end{equation*}
+    The right hand side $b$ is given by:
+    \begin{equation*}
+        b = \begin{pmatrix} b_0 \\ b_1 \\ \vdots \\ b_{N-1} \\ b_N \end{pmatrix} \text{ where }
+        b_{j = 0} = \begin{pmatrix} 0 \\ 0 \\ \vdots \\ 0 \\ 0 \end{pmatrix},
+        b_{j \in 1:N-1} = \begin{pmatrix} 2y_j^2 - 3y_j^2 + 1 \\ -Q_{1,j}/\lambda \\ \vdots \\ -Q_{N-1,j}/\lambda \\ 0 \end{pmatrix},
+        b_{j = N} = \begin{pmatrix} 0 \\ 0 \\ \vdots \\ 0 \\ 0 \end{pmatrix}.
+    \end{equation*}
+    The matrix $A$ is given by:
+    \begin{gather}
+        A = \begin{bmatrix} B_0 & C_0 & X \\ 
+                            A_1 & B_1 & C_1 \\
+                                & \ddots & \ddots & \ddots \\
+                                && A_{N-1} & B_{N-1} & C_{N-1} \\
+                                &&     Y    & A_N & B_{N}
+                        \end{bmatrix}.
+    \end{gather}
+    The submatrices $A_j,\ B_j,\ C_j,\ X,$ and $Y$ are given by:
+    \begin{gather*}
+        A_{j = 1:N-1} = \begin{bmatrix} 1/2h^2 \\ & 1/2h^2 \\ & & \ddots \\ & & & 1/2h^2 \\&  & & & 1/2h^2 \end{bmatrix}, \quad
+        A_{j = N} = \begin{bmatrix} 1/h \\ & 1/h \\ & & \ddots \\ && & 1/h \\ & & & & 1/h \end{bmatrix}, \\
+        B_{j = 0} = \begin{bmatrix} -3/2h \\ & -3/2h \\ & & \ddots \\ & & & -3/2h^2 \end{bmatrix}, \quad
+        B_{j = 1:N-1} = \begin{bmatrix} 1 \\ 1/2h^2 & -2/h^2 & 1/2h^2 \\ & \ddots & \ddots & \ddots \\ & & 1/2h^2 & -2/h^2 & 1/2h^2 \\ & & & & 1  \end{bmatrix}, \\
+        B_{j = N} = \begin{bmatrix} -3/2h \\ & -3/2h \\ & & \ddots \\ & & & -3/2h \\ & & & & -3/2h \end{bmatrix}, \quad
+        C_{0} = \begin{bmatrix} 1/h \\ & 1/h \\ && \ddots \\ &&& 1/h \\ &&&& 1/h \end{bmatrix}, \\
+        C_{j = 1:N-1} = \begin{bmatrix} 1/2h^2 \\ & 1/2h^2 \\ & & \ddots \\ & & &  1/2h^2 \\ & & & & 1/2h^2 \end{bmatrix}, \quad
+        X = \begin{bmatrix} -1/2h \\ & -1/2h \\ & & \ddots \\ & & & -1/2h \\ & & & & -1/2h \end{bmatrix}, \\
+        Y = \begin{bmatrix} -1/2h \\ & -1/2h \\ && \ddots \\ & & & -1/2h \\ & & & & -1/2h \end{bmatrix}.
+    \end{gather*}
+    Writing the system in this way is much more compact than attempting to write the matrix $A$ explicitly.
+    The $A_i$ matrices account for the $T_{i, j-1}$ contributions.
+    The $C_i$ matrices account for  the $T_{i, j+1}$ contributions.
+    The $B_i$ matrices account for the local left and right neighbor contributions.
+    $X$ and $Y$ account for the $T_{i, j + 2}$ and $T_{i, j - 2}$ contributions to the one-sided second-order boundary condition discretizations.
+    This discretization assumes that at the corners of the domain the direchlet boundary condition is enforced because at these locations, the neuman boundary connditions are incompatible with the dirichlet boundary conditions.
+    Each submatrix in $A$ is of size $N + 1\times N + 1$.
+    This means that the matrix $A$ has a size of $(N + 1)^2\times(N+1)^2$ assuming a square grid with $N^2$ nodes.
+    The total number of nonzero elements is only $11(N+1)^2 - 2(N+1)$, making this matrix quite sparse.
+    For the case $N = 100$, only $0.11\%$ of the elements of $A$ are nonzero.
+    As $N$ increases, this percentage continues to decrease.
+
+    \section{Part B: Iterative Method Forumlation}
+    \noindent\textbf{Jacobi Iteration}
+    \begin{itemize}
+        \item Bottom boundary:
+            \[T_{i,0}^{k+1} = -\frac{T_{i, 2}^k - 2T_{i,1}^k}{3} \]
+        \item Interior points:
+        \[T_{i,j}^{k+1} = \frac{2h^2Q_{i,j}}{4\lambda} -
+        \frac{1}{4}\left(T_{i-1,j}^k + T_{i + 1, j}^k + T_{i,j-1}^k + T_{i, j+1}^k\right)\]
+        \item Top boundary;
+            \[T_{i,N}^{k+1} = -\frac{T_{i, N-2}^k - 2T_{i,N-1}^k}{3}\]
+    \end{itemize}
+    \noindent\textbf{Gauss-Seidel Iteration}
+    \begin{itemize}
+        \item Bottom boundary:
+            \[T_{i,0}^{k+1} = -\frac{T_{i, 2}^k - 2T_{i,1}^k}{3} \]
+        \item Interior points:
+        \[T_{i,j}^{k+1} = \frac{2h^2Q_{i,j}}{4\lambda} -
+        \frac{1}{4}\left(T_{i-1,j}^{k+1} + T_{i + 1, j}^{k} + T_{i,j-1}^{k+1} + T_{i, j+1}^k\right)\]
+        \item Top boundary;
+            \[T_{i,N}^{k+1} = -\frac{T_{i, N-2}^{k+1} - 2T_{i,N-1}^{k + 1}}{3}\]
+    \end{itemize}
+    \noindent\textbf{Sucessive Over-relaxtion Iteration}
+    \begin{itemize}
+        \item Bottom boundary:
+            \[T_{i,0}^{k+1} = (1 - \omega)T_{i,0}^k -\omega\left(\frac{T_{i, 2}^k - 2T_{i,1}^k}{3}\right) \]
+        \item Interior points:
+            \[T_{i,j}^{k+1} = (1-\omega)T_{i,j}^k + \frac{2\omega h^2Q_{i,j}}{4\lambda} -
+        \frac{\omega}{4}\left(T_{i-1,j}^{k+1} + T_{i + 1, j}^{k} + T_{i,j-1}^{k+1} + T_{i, j+1}^k\right)\]
+        \item Top boundary;
+            \[T_{i,N}^{k+1} = (1-\omega)T_{i,j}^k -\omega\left(\frac{T_{i, N-2}^{k+1} - 2T_{i,N-1}^{k + 1}}{3}\right)\]
+    \end{itemize}
+
+\end{document}
+

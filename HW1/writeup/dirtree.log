@@ -1,0 +1,39 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.8.24)  9 SEP 2024 12:57
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**dirtree
+(/usr/local/texlive/2022/texmf-dist/tex/generic/dirtree/dirtree.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24> `dirtree' v0.32, 2012/12/11 (jcc)
+\DT@offset=\dimen138
+\DT@width=\dimen139
+\DT@sep=\dimen140
+\DT@all=\dimen141
+\DT@rulewidth=\dimen142
+\DT@dotwidth=\dimen143
+\DTbaselineskip=\dimen144
+\DT@counti=\count185
+\DT@countii=\count186
+\DT@countiii=\count187
+\DT@countiv=\count188
+\DT@indent=\dimen145
+\DT@parskip=\dimen146
+\DT@baselineskip=\dimen147
+)
+*
+! Emergency stop.
+<*> 
+    
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 49 strings out of 478268
+ 836 string characters out of 5846347
+ 289381 words of memory out of 5000000
+ 18357 multiletter control sequences out of 15000+600000
+ 469259 words of font info for 28 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 13i,0n,12p,85b,10s stack positions out of 10000i,1000n,20000p,200000b,200000s
+!  ==> Fatal error occurred, no output PDF file produced!
