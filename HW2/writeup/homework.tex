@@ -146,7 +146,7 @@
     \end{equation*}
     These approximations can be substituted into \cref{eqn:1} yielding:
     \begin{equation*}
-        \lambda\left(\frac{T_{i-1,j} + T_{i + 1,j} - 4T_{i,j} + T_{i,j-1} + T_{i,j + 1}}{2h^2}\right) = -Q_{i,j},
+        \lambda\left(\frac{T_{i-1,j} + T_{i + 1,j} - 4T_{i,j} + T_{i,j-1} + T_{i,j + 1}}{h^2}\right) = -Q_{i,j},
     \end{equation*}
     assuming that $h = \Delta x = \Delta y$.
     The Dirichelet boundary conditions on the left and right of the domain are given by $T_{0,j} = 0$ and $T_{N,j} = 2y_j^3 - 3y_j^2 + 1$.
@@ -184,7 +184,7 @@
         A_{j = 1:N-1} = \begin{bmatrix} 1/2h^2 \\ & 1/2h^2 \\ & & \ddots \\ & & & 1/2h^2 \\&  & & & 1/2h^2 \end{bmatrix}, \quad
         A_{j = N} = \begin{bmatrix} 1/h \\ & 1/h \\ & & \ddots \\ && & 1/h \\ & & & & 1/h \end{bmatrix}, \\
         B_{j = 0} = \begin{bmatrix} -3/2h \\ & -3/2h \\ & & \ddots \\ & & & -3/2h^2 \end{bmatrix}, \quad
-        B_{j = 1:N-1} = \begin{bmatrix} 1 \\ 1/2h^2 & -2/h^2 & 1/2h^2 \\ & \ddots & \ddots & \ddots \\ & & 1/2h^2 & -2/h^2 & 1/2h^2 \\ & & & & 1  \end{bmatrix}, \\
+        B_{j = 1:N-1} = \begin{bmatrix} 1 \\ 1/2h^2 & -4/h^2 & 1/2h^2 \\ & \ddots & \ddots & \ddots \\ & & 1/2h^2 & -4/h^2 & 1/2h^2 \\ & & & & 1  \end{bmatrix}, \\
         B_{j = N} = \begin{bmatrix} -3/2h \\ & -3/2h \\ & & \ddots \\ & & & -3/2h \\ & & & & -3/2h \end{bmatrix}, \quad
         C_{0} = \begin{bmatrix} 1/h \\ & 1/h \\ && \ddots \\ &&& 1/h \\ &&&& 1/h \end{bmatrix}, \\
         C_{j = 1:N-1} = \begin{bmatrix} 1/2h^2 \\ & 1/2h^2 \\ & & \ddots \\ & & &  1/2h^2 \\ & & & & 1/2h^2 \end{bmatrix}, \quad

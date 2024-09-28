@@ -1,0 +1,7 @@
+&user_inputs
+N = 50
+solver = 0
+tol = 1e-3
+bench = T
+max_iter = 100000
+&end/

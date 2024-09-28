@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1725641963 "homework.tex" "homework.pdf" "homework" 1725641963
+["pdflatex"] 1727548128 "homework.tex" "homework.pdf" "homework" 1727548129
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1246382020 1120 1e8878807317373affa7f7bba4cf2f6a ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1246382020 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -189,9 +189,9 @@
   "/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1647878959 4410336 7d30a02e9fa9a16d7d1f8d037ba69641 ""
   "/usr/local/texlive/2022/texmf-var/web2c/pdftex/pdflatex.fmt" 1661367897 2826442 06dac9906e80e99675a79ff78f0d8916 ""
   "/usr/local/texlive/2022/texmf.cnf" 1713793338 577 209b46be99c9075fd74d4c0369380e8c ""
-  "homework.aux" 1725641963 1402 fb2772b40d52186e6348c8074209da66 "pdflatex"
-  "homework.out" 1725641963 608 942b3fca8183a8bad50c07ed51b2d9fa "pdflatex"
-  "homework.tex" 1725641961 10128 00441fff419a89ddb1ad8abf8f5a1818 ""
+  "homework.aux" 1727548129 1402 fb2772b40d52186e6348c8074209da66 "pdflatex"
+  "homework.out" 1727548129 608 942b3fca8183a8bad50c07ed51b2d9fa "pdflatex"
+  "homework.tex" 1727548127 10127 8e4fa493765784554f40752d92522b45 ""
   (generated)
   "homework.aux"
   "homework.log"

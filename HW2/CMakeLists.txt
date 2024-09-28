@@ -1,26 +1,33 @@
 # Minimum CMake version required
 cmake_minimum_required(VERSION 3.10)
 
-# Project name and version
-project(main VERSION 1.0)
+# Project name and language
+project(MyFortranProject LANGUAGES Fortran)
 
-# Specify the C standard
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED True)
+# Set the Fortran standard (optional)
+set(CMAKE_Fortran_STANDARD 90)
+set(CMAKE_Fortran_STANDARD_REQUIRED ON)
 
-# Automatically find all .c files in the src/ directory
-file(GLOB SOURCES
-    ${PROJECT_SOURCE_DIR}/src/*.c
-)
+# Specify the source directory
+set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 
-# Find the libxml2 package
-find_package(LibXml2 REQUIRED)
+# Find all Fortran source files in the src directory
+file(GLOB_RECURSE Fortran_SOURCES "${SOURCE_DIR}/*.f90" "${SOURCE_DIR}/*.f" "${SOURCE_DIR}/*.f95")
 
-# Create the executable
-add_executable(main ${SOURCES})
+# Add the executable target
+add_executable(main ${Fortran_SOURCES})
 
-# Link with libxml2
-target_link_libraries(main ${LIBXML2_LIBRARIES})
+# Link any additional libraries if needed (optional)
+# target_link_libraries(MyFortranExecutable PRIVATE some_library)
 
-# Include the libxml2 headers
-target_include_directories(main PRIVATE ${LIBXML2_INCLUDE_DIR})
+# Specify include directories if needed (optional)
+# target_include_directories(MyFortranExecutable PRIVATE ${PROJECT_SOURCE_DIR}/include)
+
+# Set compiler flags if needed (optional)
+ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3")
+
+# Add additional configurations as needed
+
+# Install the executable (optional)
+# install(TARGETS MyFortranExecutable DESTINATION bin)
+
