@@ -289,11 +289,10 @@ loglog(N, tSolveJ, 'g','linewidth',2);hold on;
 loglog(N, tSolveGS,'r-','linewidth',2);
 loglog(N, tSolveSOR,'m-','linewidth',2);
 loglog(N, tSolveMG, 'b-','linewidth',2);
-legend(["Jacobi", "Gauss-seidel", "SOR", "Algebraic Multigrid", "slope = 2", "slope = 4"], 'location','northwest')
-
-
 plot(N2, 1e-7*N2.^2,'k-')
 plot(N2, 4e-8*N2.^4,'k--')
+legend(["Jacobi", "Gauss-seidel", "SOR", "Algebraic Multigrid", "slope = 2", "slope = 4"], 'location','northwest')
+
 xlabel("N");
 ylabel("Time to convergence")
 fontsize(gca,16,"points")
