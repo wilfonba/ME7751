@@ -1,9 +1,9 @@
 &user_inputs
-bench = F
-N = 4000
+N = 5
 dt = 0.1
 Re = 100
-t_start = 10
-t_stop = 40
+t_start = 0
+t_stop = 1
 t_save = 0.1
+bench = F
 &end/
