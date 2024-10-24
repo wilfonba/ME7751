@@ -9,7 +9,8 @@ module m_helpers
     private; public :: s_compute_initial_condition, &
         s_read_user_input, &
         s_print_user_input, &
-        s_print_2d_array
+        s_print_2d_array, &
+        s_update_solution
 
 contains
 
@@ -19,31 +20,77 @@ contains
     !   N - the length of Phi
     subroutine s_compute_initial_condition(Q, N)
 
-        real(kind(0d0)), dimension(0:,0:,1:) :: Q
+        type(scalar_field), dimension(1:) :: Q
         integer :: i, j, k, N
 
-        do k = 1, 2
+        ! Density
+        do j = 0, N
+            do i = 0, N
+                Q(1)%sf(i,j) = 1d0
+            end do
+        end do
+
+        ! Velocities
+        do k = 2, 3
             do j = 0, N
                 do i = 0, N
-                    Q(i,j,k) = ((-1)**k)*xs(i)*ys(j)
+                    Q(k)%sf(i,j) = 0d0
                 end do
             end do
         end do
 
+        do i = 0, N
+            ! Left wall
+            Q(1)%sf(0, i) = 1d0
+            Q(2)%sf(0,i) = 0d0
+            Q(3)%sf(0,i) = 0d0
+
+            ! Bottom Wall
+            Q(1)%sf(i,0) = 1d0
+            Q(2)%sf(i,0) = 0d0
+            Q(3)%sf(i,0) = 0d0
+
+            ! Left Wall
+            Q(1)%sf(N,i) = 1d0
+            Q(2)%sf(N,i) = 0d0
+            Q(3)%sf(N,i) = 0d0
+        end do
+
+        do i = 1, N-1
+            Q(1)%sf(i,N) = 1d0
+            Q(2)%sf(i,N) = 1d0
+            Q(3)%sf(i,N) = 0d0
+        end do
+
     end subroutine s_compute_initial_condition
+
+    subroutine s_update_solution(Q, dU, N)
+
+        type(scalar_field), dimension(1:) :: Q, dU
+        integer :: i, j, k, N
+
+        do k = 1, 3
+            do j = 1, N-1
+                do i = 1, N-1
+                    Q(k)%sf(i,j) = dU(k)%sf(i,j) + Q(k)%sf(i,j)
+                end do
+            end do
+        end do
+
+    end subroutine s_update_solution
 
     ! This subroutine reads a namelist of user inputs.
     ! It requires no arguments
-    subroutine s_read_user_input(N)
+    subroutine s_read_user_input(N, max_iter, save_iter)
 
-        integer :: N
+        integer :: N, max_iter, save_iter
 
         character(LEN=100) :: line
         character(LEN=100) :: file_path = 'main.inp'
         integer :: iostatus
         logical :: file_exist
 
-        namelist /user_inputs/ N, dt, Re, t_start, t_stop, t_save, bench
+        namelist /user_inputs/ N, dt, Re, beta, bench, max_iter, save_iter
 
         inquire (FILE=trim(file_path), EXIST=file_exist)
 

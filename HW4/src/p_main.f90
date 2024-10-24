@@ -8,6 +8,8 @@ program p_main
     use m_helpers
 
     use m_vtk
+
+    use m_finite_difference
     ! =======================================================
 
     implicit none
@@ -15,36 +17,32 @@ program p_main
     integer :: N          ! global number of cells in x-direction
     integer :: n_test = 1 ! number of tests to run
     real(kind(0d0)) :: h  ! Global grid spacing
-    integer :: i, j       ! Standard loop iterator
+    integer :: i, j, k    ! Standard loop iterator
 
     real(kind(0d0)) :: tr_start, tr_stop, tr_total
 
-    integer :: n_stop  ! total # of time steps
-    integer :: n_save ! time step interval at which to save
+    integer :: max_iter, save_iter, n_iter
 
-    real(kind(0d0)), dimension(:,:,:), allocatable :: Q
+    integer :: save_count = 0
+
+    ! Scalar field of solution variables and variable updates
+    ! Q(1)%sf stores the density field
+    ! Q(2)%sf stores the x-velocity field
+    ! Q(3)%sf stores the y-velocity field
+    type(scalar_field), allocatable, dimension(:) :: Q, dUP, dU, RHS
+
+    ! Sparse matrix storage for LHS
+    type(scalar_field), allocatable, dimension(:) :: LHS
 
     character(len=10) :: name
 
-    call s_read_user_input(N)
+    call s_read_user_input(N, max_iter, save_iter)
 
     call s_initialize_global_parameters(N, h)
 
     call s_print_user_input(N)
 
-    call s_intitialize_problem()
-
-    call s_compute_initial_condition(Q, N)
-
-    call s_open_vtk_data_file(N, 0)
-    name = "variable0"
-    call s_write_variable_to_vtk_file(Q(0:N,0:N,1),N,name)
-    name = "variable1"
-    call s_write_variable_to_vtk_file(Q(0:N,0:N,2),N,name)
-    call s_close_vtk_data_file()
-
-    n_stop = (t_stop-t_start)/dt
-    n_save = t_save/dt
+    call s_initialize_problem()
 
     if (bench) then
         n_test = 1e2
@@ -54,43 +52,93 @@ program p_main
 
     do i = 1, n_test
 
+        call s_compute_initial_condition(Q, N)
+
+        call s_save_data(Q, N, save_count)
+
+        n_iter = 0
+
         call cpu_time(tr_start)
 
-        do j = 1, n_stop
+        do j = 1, max_iter
 
-            ! Saving and terminating
-            if (mod(j, n_save) == 0) then
+            call s_compute_rhs(Q, RHS, N, h)
 
-                if (j == n_stop) continue
-            end if
+            !call s_compute_lhs(Q, LHS, 1, N, h)
+
+            do k = 1, 3
+                call s_TDMA(LHS(i)%sf, dUP(i)%sf, RHS(i)%sf, N)
+            end do
+
+            !call s_compute_lhs(Q, LHS, 2, N, h)
+
+            do k = 1, 3
+                call s_TDMA(LHS(i)%sf, dU(i)%sf, dUP(i)%sf, N)
+            end do
+
+            call s_update_solution(Q, dU, N)
+
+            n_iter = n_iter + 1
 
         end do
+
+        call s_save_data(Q, N, 1)
 
         call cpu_time(tr_stop)
 
         tr_total = tr_total + tr_stop - tr_start
 
         if (bench) then
-            print*, "Test ", i, " completed."
+            !!print*, "Test ", i, " completed."
         end if
 
     end do
 
-    call s_finalize_problem()
-
     print*, "Runtime Inforation:"
     print*, "Time To Solution: ", tr_total/n_test
-    print*, "Time/Step: ", tr_total/(n_test*n_stop)
+    print*, "Time/Step: ", tr_total/(n_test*j)
+
+    call s_finalize_problem()
 
 contains
 
-    subroutine s_intitialize_problem()
+    subroutine s_initialize_problem()
 
-        allocate(Q(0:N,0:N,1:2))
+        integer :: i
 
-    end subroutine s_intitialize_problem
+        allocate(Q(1:3))
+        allocate(dU(1:3))
+        allocate(DUP(1:3))
+        allocate(RHS(1:3))
+        allocate(LHS(1:3))
+
+        do i = 1,3
+            allocate(Q(i)%sf(0:N, 0:N))
+            allocate(dU(i)%sf(0:N, 0:N))
+            allocate(dUP(i)%sf(0:N, 0:N))
+            allocate(RHS(i)%sf(0:N, 0:N))
+            allocate(LHS(i)%sf(0:N, 0:2))
+        end do
+
+    end subroutine s_initialize_problem
 
     subroutine s_finalize_problem()
+
+        integer :: i
+
+        do i = 1,3
+            deallocate(Q(i)%sf)
+            deallocate(dU(i)%sf)
+            deallocate(dUP(i)%sf)
+            deallocate(RHS(i)%sf)
+            deallocate(LHS(i)%sf)
+        end do
+
+        deallocate(Q)
+        deallocate(dU)
+        deallocate(DUP)
+        deallocate(RHS)
+        deallocate(LHS)
 
 
     end subroutine s_finalize_problem

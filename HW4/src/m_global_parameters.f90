@@ -12,13 +12,16 @@ module m_global_parameters
     real(kind(0d0)) :: dt    ! Delta t
     integer :: Re            ! Reynolds number
     logical :: bench         ! whether to benchmark or not
-    real(kind(0d0)) :: t_start ! start time
-    real(kind(0d0)) :: t_stop  ! stop time
-    real(kind(0d0)) :: t_save  ! save interval
+    real(kind(0d0)) :: beta
 
-    integer :: n_fields = 2
+    integer :: n_fields = 3
 
     real(kind(0d0)), dimension(:), allocatable :: xs, ys ! global x cooredinates of FD points
+
+    !> Derived type annexing a scalar field (SF)
+    type scalar_field
+        real(kind(0d0)), pointer, dimension(:, :) :: sf => null()
+    end type scalar_field
 
     public
 

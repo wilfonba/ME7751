@@ -1,9 +1,9 @@
 &user_inputs
-N = 5
+N = 100
+beta = 1
 dt = 0.1
 Re = 100
-t_start = 0
-t_stop = 1
-t_save = 0.1
 bench = F
+max_iter = 100
+save_iter = 100
 &end/

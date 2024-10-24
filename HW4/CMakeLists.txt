@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.10)
 # Project name and language
 project(MyFortranProject LANGUAGES Fortran)
 
+# Set compiler flags if needed (optional)
+ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g")
+
 # Set the Fortran standard (optional)
 set(CMAKE_Fortran_STANDARD 90)
 set(CMAKE_Fortran_STANDARD_REQUIRED ON)
@@ -22,9 +25,6 @@ add_executable(main ${Fortran_SOURCES})
 
 # Specify include directories if needed (optional)
 # target_include_directories(MyFortranExecutable PRIVATE ${PROJECT_SOURCE_DIR}/include)
-
-# Set compiler flags if needed (optional)
-# set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3")
 
 # Add additional configurations as needed
 

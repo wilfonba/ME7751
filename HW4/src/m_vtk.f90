@@ -6,11 +6,27 @@ module m_vtk
 
     implicit none
 
-    private; public :: s_open_vtk_data_file, &
+    private; public :: s_save_data, &
+        s_open_vtk_data_file, &
         s_write_variable_to_vtk_file, &
         s_close_vtk_data_file
 
 contains
+
+    subroutine s_save_data(Q, n, save_count)
+
+        type(scalar_field), dimension(1:) :: Q
+        integer :: n, save_count
+
+        call s_open_vtk_data_file(n, save_count)
+
+        call s_write_variable_to_vtk_file(Q(1)%sf, n, 'density')
+        call s_write_variable_to_vtk_file(Q(2)%sf, n, 'x-velocity')
+        call s_write_variable_to_vtk_file(Q(3)%sf, n, 'y-velocity')
+
+        call s_close_vtk_data_file()
+
+    end subroutine s_save_data
 
     subroutine s_open_vtk_data_file(N, n_save)
 
@@ -23,11 +39,9 @@ contains
 
         inquire(file=trim(dir_name), exist=dir_exists)
 
-        if (dir_exists) then
-            call system('rm -rf '//trim(dir_name))
+        if (.not. dir_exists) then
+            call system('mkdir '//trim(dir_name))
         end if
-
-        call system('mkdir '//trim(dir_name))
 
         file_name = trim(dir_name)//'/output_'//trim(f_int_to_str(n_save))//'.vtr'
 
